@@ -319,7 +319,7 @@ public class RestRepository implements Closeable, StatsAware {
                         int nextInt = rnd.nextInt(nodes.size());
                         String nodeAddress = nodes.get(nextInt);
                         // create a fake node
-                        Node node = new Node(shard.getNode(), "wan-only-node-" + nextInt, StringUtils.parseIpAddress(nodeAddress));
+                        Node node = new Node(shard.getNode(), "wan-only-node-" + nextInt, StringUtils.parseHTTPAddress(nodeAddress));
                         httpNodes.put(shard.getNode(), node);
                     }
                 }

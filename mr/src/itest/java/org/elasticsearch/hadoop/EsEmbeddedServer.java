@@ -59,7 +59,7 @@ public class EsEmbeddedServer {
         String localNodeId = node.client().admin().cluster().prepareState().get().getState().getNodes().getLocalNodeId();
         String value = node.client().admin().cluster().prepareNodesInfo(localNodeId).get().iterator().next().getHttp().address().publishAddress().toString();
 
-        ipAndPort = StringUtils.parseIpAddress(value);
+        ipAndPort = StringUtils.parseHTTPAddress(value);
     }
 
     public void stop() {

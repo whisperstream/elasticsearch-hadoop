@@ -21,6 +21,8 @@ package org.elasticsearch.hadoop.util;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -435,6 +437,33 @@ public abstract class StringUtils {
             return new IpAndPort(ip, port);
         }
         return new IpAndPort(httpAddr);
+    }
+
+    public static IpAndPort parseHTTPAddress(String httpAddr) {
+        // strip ip address - regex would work but it's overkill
+
+        // there are four formats - ip:port, hostname/ip:port or [/ip:port] and [hostname/ip:port]
+        // first the ip is normalized
+        if (httpAddr.contains("/")) {
+            int startIp = httpAddr.indexOf("[") + 1;
+            int endIp = httpAddr.indexOf("/");
+            if (endIp - startIp > 1) {
+                // detected case: [/ip:port]
+                String hostname = httpAddr.substring(startIp, endIp);
+                try {
+                    String ip = InetAddress.getByName(hostname).getHostAddress();
+                    int startPort = httpAddr.lastIndexOf(":") + 1;
+                    int endPort = httpAddr.lastIndexOf("]");
+                    if (endPort < 0)
+                        endPort = httpAddr.length();
+                    String port = httpAddr.substring(startPort, endPort);
+                    httpAddr = ip + ":" + port;
+                } catch (UnknownHostException e) {
+                    throw new EsHadoopIllegalStateException("Unable to resolve hostname:'" + hostname + "' from http address: " + httpAddr);
+                }
+            }
+        }
+        return parseIpAddress(httpAddr);
     }
 
     public static String normalize(String path) {

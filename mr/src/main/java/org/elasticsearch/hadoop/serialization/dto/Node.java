@@ -60,7 +60,7 @@ public class Node implements Serializable {
             return;
         }
 
-        IpAndPort ip = StringUtils.parseIpAddress(http.toString());
+        IpAndPort ip = StringUtils.parseHTTPAddress(http.toString());
         ipAddress = ip.ip;
         httpPort = ip.port;
     }

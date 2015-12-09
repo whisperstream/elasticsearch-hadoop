@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.net.InetAddress;
 
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.map.DeserializationConfig;
@@ -110,7 +111,7 @@ public class RestClient implements Closeable, StatsAware {
         for (Map value : nodes.values()) {
             String inet = (String) value.get("http_address");
             if (StringUtils.hasText(inet)) {
-                hosts.add(StringUtils.parseIpAddress(inet).toString());
+                hosts.add(StringUtils.parseHTTPAddress(inet).toString());
             }
         }
 

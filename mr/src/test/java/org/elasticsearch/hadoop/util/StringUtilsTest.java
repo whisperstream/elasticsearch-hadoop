@@ -22,6 +22,9 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class StringUtilsTest {
 
     @Test
@@ -33,22 +36,26 @@ public class StringUtilsTest {
 
     @Test
     public void testParseIpInEs1x() {
-        assertEquals("1.2.3.4", StringUtils.parseIpAddress("inet[/1.2.3.4:9200]").ip);
+        assertEquals("1.2.3.4", StringUtils.parseHTTPAddress("inet[/1.2.3.4:9200]").ip);
     }
 
     @Test
-    public void testParseIpInEs1xWithHostName() {
-        assertEquals("11.22.33.44", StringUtils.parseIpAddress("inet[foobar/11.22.33.44:9200]").ip);
+    public void testParseIpInEs1xWithHostName() throws UnknownHostException {
+        String hostname ="google.com";
+        String ip = InetAddress.getByName(hostname).getHostAddress();
+        assertEquals(ip, StringUtils.parseHTTPAddress("inet[" + hostname + "/11.22.33.44:9200]").ip);
     }
 
     @Test
     public void testParseIpInEs2x() {
-        assertEquals("111.222.333.444", StringUtils.parseIpAddress("111.222.333.444:9200").ip);
+        assertEquals("111.222.333.444", StringUtils.parseHTTPAddress("111.222.333.444:9200").ip);
     }
 
     @Test
-    public void testParseIpInEs2xWithHostName() {
-        assertEquals("11.222.3.4", StringUtils.parseIpAddress("foobar/11.222.3.4:9200").ip);
+    public void testParseIpInEs2xWithHostName() throws UnknownHostException {
+        String hostname = "google.com";
+        String ip = InetAddress.getByName(hostname).getHostAddress();
+        assertEquals(ip, StringUtils.parseHTTPAddress(hostname + "/11.222.3.4:9200").ip);
     }
 
 }
