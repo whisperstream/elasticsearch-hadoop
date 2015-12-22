@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.Socket;
 
+//import com.sun.xml.internal.ws.util.StringUtils;
 import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpClient;
@@ -65,7 +66,6 @@ import org.elasticsearch.hadoop.rest.stats.StatsAware;
 import org.elasticsearch.hadoop.util.ByteSequence;
 import org.elasticsearch.hadoop.util.ReflectionUtils;
 import org.elasticsearch.hadoop.util.StringUtils;
-
 /**
  * Transport implemented on top of Commons Http. Provides transport retries.
  */
@@ -180,7 +180,22 @@ public class CommonsHttpTransport implements Transport, StatsAware {
         hostConfig = (HostConfiguration) authSettings[0];
 
         try {
-            hostConfig.setHost(new URI(escapeUri(host, settings.getNetworkSSLEnabled()), false));
+
+            // 2015.12.22 - axdahl@cisco.com
+            // doing A LOT of work here because parsing of hostname:port Strings is NOT
+            // supported by the current version of org.apache.commons.httpclient.URI
+
+            String escapedHost = escapeUri(host, settings.getNetworkSSLEnabled());
+            URI uri = new URI(escapedHost);
+            String schemalessHost = escapedHost.toLowerCase().replace(uri.getScheme().toLowerCase() + "://", "");
+            if (schemalessHost.indexOf(':') < 0) {
+                // if no port is specified, just add -1 as the default
+                schemalessHost += ":-1";
+            }
+            // separate out the hostname and port
+            StringUtils.IpAndPort httpAddr = StringUtils.parseHTTPAddress(schemalessHost);
+
+            hostConfig.setHost(uri.getHost(), httpAddr.port, Protocol.getProtocol(uri.getScheme()));
         } catch (IOException ex) {
             throw new EsHadoopTransportException("Invalid target URI " + host, ex);
         }

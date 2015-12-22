@@ -440,27 +440,21 @@ public abstract class StringUtils {
     }
 
     public static IpAndPort parseHTTPAddress(String httpAddr) {
-        // strip ip address - regex would work but it's overkill
-
         // there are four formats - ip:port, hostname/ip:port or [/ip:port] and [hostname/ip:port]
         // first the ip is normalized
         if (httpAddr.contains("/")) {
             int startIp = httpAddr.indexOf("[") + 1;
             int endIp = httpAddr.indexOf("/");
             if (endIp - startIp > 1) {
-                // detected case: [/ip:port]
+                // checked for case: [/ip:port]
                 String hostname = httpAddr.substring(startIp, endIp);
-                try {
-                    String ip = InetAddress.getByName(hostname).getHostAddress();
-                    int startPort = httpAddr.lastIndexOf(":") + 1;
-                    int endPort = httpAddr.lastIndexOf("]");
-                    if (endPort < 0)
-                        endPort = httpAddr.length();
-                    String port = httpAddr.substring(startPort, endPort);
-                    httpAddr = ip + ":" + port;
-                } catch (UnknownHostException e) {
-                    throw new EsHadoopIllegalStateException("Unable to resolve hostname:'" + hostname + "' from http address: " + httpAddr);
-                }
+                String ip = hostname; // use full hostname where available to make connections
+                int startPort = httpAddr.lastIndexOf(":") + 1;
+                int endPort = httpAddr.lastIndexOf("]");
+                if (endPort < 0)
+                    endPort = httpAddr.length();
+                String port = httpAddr.substring(startPort, endPort);
+                return new IpAndPort(hostname, Integer.valueOf(port));
             }
         }
         return parseIpAddress(httpAddr);

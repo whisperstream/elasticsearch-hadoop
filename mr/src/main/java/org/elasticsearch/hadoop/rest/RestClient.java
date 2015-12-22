@@ -27,6 +27,8 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -115,7 +117,7 @@ public class RestClient implements Closeable, StatsAware {
             }
         }
 
-        return hosts;
+        return new ArrayList<String>(hosts.isEmpty() ? new HashSet<String>() : new HashSet<String>(hosts));
     }
 
     private <T> T get(String q, String string) {
@@ -330,7 +332,7 @@ public class RestClient implements Closeable, StatsAware {
                 nodes.add(node.getInet());
             }
         }
-        return nodes;
+        return new ArrayList<String>(nodes.isEmpty() ? new HashSet<String>() : new HashSet<String>(nodes));
     }
 
     public List<String> getHttpDataNodes() {

@@ -40,10 +40,10 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testParseIpInEs1xWithHostName() throws UnknownHostException {
+    public void testParseIpInEs1xWithHostName() {
         String hostname ="google.com";
-        String ip = InetAddress.getByName(hostname).getHostAddress();
-        assertEquals(ip, StringUtils.parseHTTPAddress("inet[" + hostname + "/11.22.33.44:9200]").ip);
+        assertEquals(hostname, StringUtils.parseHTTPAddress("inet[" + hostname + "/11.22.33.44:9200]").ip);
+        assertEquals(9200, StringUtils.parseHTTPAddress("inet[" + hostname + "/11.22.33.44:9200]").port);
     }
 
     @Test
@@ -52,10 +52,10 @@ public class StringUtilsTest {
     }
 
     @Test
-    public void testParseIpInEs2xWithHostName() throws UnknownHostException {
+    public void testParseIpInEs2xWithHostName() {
         String hostname = "google.com";
-        String ip = InetAddress.getByName(hostname).getHostAddress();
-        assertEquals(ip, StringUtils.parseHTTPAddress(hostname + "/11.222.3.4:9200").ip);
+        assertEquals(hostname, StringUtils.parseHTTPAddress(hostname + "/11.222.3.4:9200").ip);
+        assertEquals(9200, StringUtils.parseHTTPAddress(hostname + "/11.222.3.4:9200").port);
     }
 
 }
